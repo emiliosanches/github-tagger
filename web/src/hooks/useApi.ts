@@ -32,7 +32,7 @@ export function useApi<T>({ manual = false, ...axiosOptions }: UseApiOptions) {
         setIsLoading(false);
       }
     },
-    [axiosOptions]
+    []
   );
 
   useEffect(() => {
