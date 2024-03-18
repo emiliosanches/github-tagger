@@ -14,9 +14,18 @@ datasource db {
 }
 
 model User {
-  id              String @id @unique @default(uuid())
-  email           String @unique
+  id              String          @id @unique @default(uuid())
+  email           String          @unique
   name            String
   githubId        Int
   githubAvatarURL String
+  repositoryTags  RepositoryTag[]
+}
+
+model RepositoryTag {
+  id           String @id @unique @default(uuid())
+  text         String
+  repositoryId Int
+  userId       String
+  user         User   @relation(fields: [userId], references: [id])
 }

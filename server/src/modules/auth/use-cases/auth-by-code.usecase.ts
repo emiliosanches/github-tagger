@@ -18,29 +18,25 @@ export class AuthByCodeUseCase {
 
     console.log(tokenResponse.data);
 
-    const { data: userResponse } = await githubApi
-      .get<GithubUser>("/user", {
-        headers: {
-          Authorization: `Bearer ${tokenResponse.data.access_token}`,
-        },
-      })
-      .catch((err) => {
-        console.log(err.response.data);
-        console.log(err.response.config.headers);
-        console.log(err.response.config);
-        throw err;
-      });
-
-    const { data: userEmailsResponse } = await githubApi.get<GithubUserEmail[]>("/user/emails", {
+    const { data: userResponse } = await githubApi.get<GithubUser>("/user", {
       headers: {
         Authorization: `Bearer ${tokenResponse.data.access_token}`,
       },
     });
 
+    const { data: userEmailsResponse } = await githubApi.get<GithubUserEmail[]>(
+      "/user/emails",
+      {
+        headers: {
+          Authorization: `Bearer ${tokenResponse.data.access_token}`,
+        },
+      }
+    );
+
     const primaryEmail = userEmailsResponse.find((email) => email.primary);
 
-    // todo change to custom error
-    if (!primaryEmail) throw new Error();
+    if (!primaryEmail)
+      throw new Error(`User ${userResponse.id} has no primary email`);
 
     let databaseUser = await this.prisma.user.findUnique({
       where: {

@@ -1,9 +1,11 @@
 import { NextFunction, Request, Response, Router } from "express";
-import { forwardException } from "../helpers/forward-exception";
 import { modules } from "../modules";
 import { CustomRouter } from "./custom-router";
 
-const { authController, authMiddleware } = modules.auth;
+const {
+  auth: { authController, authMiddleware },
+  repositories: { repositoriesController },
+} = modules;
 
 function protectedRoute(req: Request, res: Response, next: NextFunction) {
   return authMiddleware.verify(req, res, next);
@@ -11,13 +13,10 @@ function protectedRoute(req: Request, res: Response, next: NextFunction) {
 
 const router = new CustomRouter(Router());
 
-router.post(
-  "/auth",
-  forwardException((req, res) => authController.authByCode(req, res))
-);
+router.post("/auth", (req, res) => authController.authByCode(req, res));
 
-router.get("/protected-route", protectedRoute, (req, res) =>
-  res.send("Hello world")
+router.get("/repositories", protectedRoute, (req, res) =>
+  repositoriesController.listFavoriteRepositories(req, res)
 );
 
 export { router };

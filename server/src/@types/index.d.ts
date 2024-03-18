@@ -1,10 +1,11 @@
-import { Language, User } from "../custom";
+import { User } from "@prisma/client";
 
 export {};
 
 declare global {
   namespace Express {
     export interface Request {
+      user: User;
       githubAccessToken: string;
     }
   }

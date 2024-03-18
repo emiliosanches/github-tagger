@@ -2,6 +2,7 @@
   "ts-node": {
     "files": true
   },
+  "include": ["src/**/*.ts"],
   "files": [
     "src/index.ts",
     "src/@types/index.d.ts"

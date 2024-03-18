@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { AuthController } from "./controllers/auth-controller";
+import { AuthController } from "./controllers/auth.controller";
 import { AuthByCodeUseCase } from "./use-cases/auth-by-code.usecase";
 import { AuthMiddleware } from "./middleware/auth.middleware";
 
