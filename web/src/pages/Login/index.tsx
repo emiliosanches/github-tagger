@@ -2,7 +2,9 @@
 
 const githubLoginURL = `https://github.com/login/oauth/authorize?scope=user&client_id=${
   import.meta.env.VITE_CLIENT_ID
-}&redirect_uri=${encodeURIComponent(import.meta.env.VITE_REDIRECT_URI)}`;
+}&redirect_uri=${encodeURIComponent(
+  import.meta.env.VITE_REDIRECT_URI
+)}&scope=read:user,user:email`;
 
 export function Login() {
   return (
