@@ -7,9 +7,9 @@ export class AuthController {
     private readonly authByCodeUseCase: AuthByCodeUseCase,
   ) {}
 
-  authByCode(req: Request, res: Response) {
+  async authByCode(req: Request, res: Response) {
     const { code } = authByCodeSchema.parse(req.body);
   
-    return this.authByCodeUseCase.execute(code);
+    return res.send(await this.authByCodeUseCase.execute(code));
   }
 }
