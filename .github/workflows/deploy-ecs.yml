@@ -1,0 +1,50 @@
+name: Deploy to Amazon ECS
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: us-east-1                   
+  ECR_REPOSITORY_URI: 070045005137.dkr.ecr.us-east-1.amazonaws.com/github-tagger          
+  ECS_SERVICE: GithubTaggerService                 
+  ECS_CLUSTER: GithubTaggerClusterASG                
+  ECS_TASK_DEFINITION: arn:aws:ecs:us-east-1:070045005137:task-definition/RepoTaggerTaskDefinition:2 
+                                               # file, e.g. .aws/task-definition.json
+  CONTAINER_NAME: container-single           # set this to the name of the container in the
+                                               # containerDefinitions section of your task definition
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@0e613a0980cbf65ed5b322eb7a1e075d28913a83
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@62f4f872db3836360b72999f4b87f1ff13310f3a
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        run: |
+          cd server
+          docker build -t $ECR_REPOSITORY_URI:latest .
+          docker push $ECR_REPOSITORY_URI:latest
+          echo "image=$ECR_REPOSITORY_URI:latest" >> $GITHUB_OUTPUT
+
+      - name: Update ECS tasks
+        id: update-tasks
+        run: aws ecs update-service --cluster GithubTaggerCluster --service GithubTaggerService --task-definition RepoTaggerTaskDefinition
+
