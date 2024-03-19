@@ -5,13 +5,19 @@ const instance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
-interface UseApiOptions {
-  manual?: boolean;
+interface UseApiFetchOptions {
   axiosOptions: Omit<AxiosRequestConfig, "baseURL">;
+  routeParams?: {
+    [x: string]: string;
+  };
+}
+
+interface UseApiOptions extends UseApiFetchOptions {
+  manual?: boolean;
 }
 
 export function useApi<T>(
-  { manual = false, axiosOptions }: UseApiOptions,
+  { manual = false, axiosOptions, routeParams }: UseApiOptions,
   depsArray: unknown[]
 ) {
   const [data, setData] = useState<T>();
@@ -19,13 +25,26 @@ export function useApi<T>(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [error, setError] = useState<any>();
 
-  async function fetch(options?: Omit<AxiosRequestConfig, "baseURL">) {
+  async function fetch(options?: UseApiFetchOptions) {
     setData(undefined);
     setError(undefined);
     setIsLoading(true);
 
     try {
-      const res = await instance({ ...axiosOptions, ...options });
+      const newAxiosOptions = { ...axiosOptions, ...options?.axiosOptions };
+      const newRouteParams = { ...routeParams, ...options?.routeParams };
+
+      let url = newAxiosOptions.url!;
+
+      console.log(newRouteParams);
+
+      Object.entries(newRouteParams).forEach(([paramName, paramValue]) => {
+        url = url.replace(new RegExp(`:${paramName}`, "g"), paramValue);
+
+        console.log({ paramName, paramValue, url });
+      });
+
+      const res = await instance({ ...newAxiosOptions, url });
       setData(res.data);
       return res;
     } catch (error) {

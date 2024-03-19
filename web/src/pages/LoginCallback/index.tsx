@@ -27,8 +27,10 @@ export function LoginCallback() {
     }
 
     dispatchAuth({
-      data: {
-        code,
+      axiosOptions: {
+        data: {
+          code,
+        },
       },
     }).then(({ data }) => {
       setToken(data.access_token);

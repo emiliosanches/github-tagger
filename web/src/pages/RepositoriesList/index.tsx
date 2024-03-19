@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import incentivemeLogo from "../../assets/logo.svg";
 import { useApi } from "../../hooks/useApi";
@@ -20,12 +20,19 @@ import {
 import { Input } from "../../components/Input";
 import { Button } from "../../components/Button";
 import { useNavigate } from "react-router-dom";
+import Modal from "../../components/RepositoryModal";
+import { AxiosError } from "axios";
 
 export function RepositoriesList() {
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [openRepoId, setOpenRepoId] = useState<number>();
 
-  const { data: repositories, error } = useApi<Repository[]>(
+  const {
+    data: repositories,
+    error,
+    dispatch: refreshRepos,
+  } = useApi<Repository[]>(
     {
       axiosOptions: {
         url: "/repositories",
@@ -37,12 +44,68 @@ export function RepositoriesList() {
     []
   );
 
+  const modalData = useMemo(() => {
+    return repositories?.find((r) => r.id === openRepoId);
+  }, [openRepoId, repositories]);
+
+  const { dispatch: dispatchAddTag } = useApi(
+    {
+      axiosOptions: {
+        url: "/repositories/:id/tags",
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+      manual: true,
+    },
+    []
+  );
+
   useEffect(() => {
     if (error) {
       alert("There was an error when trying to list your starred repos");
       navigate("/");
     }
   }, [error]);
+
+  function handleOpenModal(repo: Repository) {
+    setOpenRepoId(repo.id);
+  }
+
+  console.log(token);
+
+  async function handleAddTag(repositoryId: number, text: string) {
+    try {
+      await dispatchAddTag({
+        routeParams: {
+          id: String(repositoryId),
+        },
+        axiosOptions: {
+          data: {
+            tagText: text,
+          },
+        },
+      });
+
+      await refreshRepos();
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 409) {
+          alert("There is already a tag with this name in the repository.");
+        }
+      }
+
+      alert("There was an error when trying to add this tag to the repository");
+    }
+  }
+
+  function handleDeleteTag(repositoryId: number, text: string) {
+    console.log({
+      repositoryId,
+      text,
+    });
+  }
 
   return (
     <Container>
@@ -59,7 +122,10 @@ export function RepositoriesList() {
         <RepositoryList>
           {repositories &&
             repositories.map((repo) => (
-              <RepositoryListItem>
+              <RepositoryListItem
+                key={repo.id}
+                onClick={() => handleOpenModal(repo)}
+              >
                 <RepositoryInfoContainer>
                   <RepositoryName>{repo.name}</RepositoryName>
                   <RepositoryOwnerName>{repo.owner.login}</RepositoryOwnerName>
@@ -79,6 +145,14 @@ export function RepositoriesList() {
             ))}
         </RepositoryList>
       </ListingContainer>
+
+      <Modal
+        isOpen={!!modalData}
+        onClose={() => setOpenRepoId(undefined)}
+        repo={modalData}
+        onAddTag={handleAddTag}
+        onDeleteTag={handleDeleteTag}
+      />
     </Container>
   );
 }

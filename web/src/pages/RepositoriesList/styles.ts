@@ -44,6 +44,11 @@ export const RepositoryListItem = styled.li`
   display: flex;
   justify-content: space-between;
   padding: 2rem;
+  cursor: pointer;
+
+  &:hover {
+    background: #ddd;
+  }
 
   &:not(:last-child) {
     border-bottom: 2px solid black;
