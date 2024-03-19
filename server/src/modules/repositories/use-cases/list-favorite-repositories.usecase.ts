@@ -5,7 +5,7 @@ import { githubApi } from "../../../services/github/github-api";
 export class ListFavoriteRepositoriesUseCase {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async execute(access_token: string, userId: string) {
+  async execute(access_token: string, userId: string, search?: string) {
     const { data: repos } = await githubApi.get<GithubRepo[]>("/user/starred", {
       headers: {
         Authorization: `Bearer ${access_token}`,
@@ -27,9 +27,15 @@ export class ListFavoriteRepositoriesUseCase {
       tagsByRepoId[tag.repositoryId].push(tag);
     }
 
-    return repos.map((repo) => ({
+    const reposWithTags = repos.map((repo) => ({
       ...repo,
       tags: tagsByRepoId[repo.id],
     }));
+
+    if (!search) return reposWithTags;
+
+    return reposWithTags.filter((repo) =>
+      repo.tags?.some((tag) => tag.text.includes(search))
+    );
   }
 }

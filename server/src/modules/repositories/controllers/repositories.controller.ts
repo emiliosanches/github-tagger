@@ -12,10 +12,15 @@ export class RepositoriesController {
   ) {}
 
   async listFavoriteRepositories(req: Request, res: Response) {
+    let search = Array.isArray(req.query.q) ? req.query.q[0] : req.query.q;
+
+    if (typeof search === 'object') search = undefined;
+
     return res.send(
       await this.listFavRepositoriesUseCase.execute(
         req.githubAccessToken,
-        req.user.id
+        req.user.id,
+        search
       )
     );
   }
