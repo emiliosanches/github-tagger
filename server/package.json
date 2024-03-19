@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "start:dev": "tsnd src/index --ignore-watch node_modules --project ./tsconfig.json"
+    "start:dev": "tsnd src/index --ignore-watch node_modules --project ./tsconfig.json",
+    "start": "node dist/index"
   },
   "dependencies": {
     "@prisma/client": "^5.11.0",
