@@ -15,7 +15,7 @@ import {
   RepositoryOwnerName,
   RepositoryTag,
   RepositoryTagsContainer,
-  SearchContainer,
+  SearchForm,
 } from "./styles";
 import { Input } from "../../components/Input";
 import { Button } from "../../components/Button";
@@ -27,6 +27,7 @@ export function RepositoriesList() {
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
   const [openRepoId, setOpenRepoId] = useState<number>();
+  const [search, setSearch] = useState("");
 
   const {
     data: repositories,
@@ -38,6 +39,9 @@ export function RepositoriesList() {
         url: "/repositories",
         headers: {
           Authorization: `Bearer ${token}`,
+        },
+        params: {
+          q: search || undefined,
         },
       },
     },
@@ -137,12 +141,21 @@ export function RepositoriesList() {
         <img src={incentivemeLogo} />
       </Header>
       <ListingContainer>
-        <SearchContainer>
-          <Input placeholder="Pesquisa por tags" />
+        <SearchForm
+          onSubmit={(e) => {
+            e.preventDefault();
+            refreshRepos();
+          }}
+        >
+          <Input
+            placeholder="Pesquisa por tags"
+            value={search}
+            onChange={({ target }) => setSearch(target.value)}
+          />
           <Button>
             <FaSearch />
           </Button>
-        </SearchContainer>
+        </SearchForm>
         <RepositoryList>
           {repositories &&
             repositories.map((repo) => (

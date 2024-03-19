@@ -21,7 +21,7 @@ export const ListingContainer = styled.main`
   flex: 1;
 `;
 
-export const SearchContainer = styled.section`
+export const SearchForm = styled.form`
   display: flex;
   gap: 1.2rem;
   padding: 3.2rem;
