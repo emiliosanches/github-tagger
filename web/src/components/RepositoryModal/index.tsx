@@ -26,7 +26,7 @@ interface ModalProps {
   onDeleteTag: (repositoryId: number, text: string) => void;
 }
 
-export function Modal({ isOpen, onClose, repo, onAddTag }: ModalProps) {
+export function Modal({ isOpen, onClose, repo, onAddTag, onDeleteTag }: ModalProps) {
   const [tagText, setTagText] = useState("");
 
   return (
@@ -44,7 +44,12 @@ export function Modal({ isOpen, onClose, repo, onAddTag }: ModalProps) {
           <TagsContainer>
             <TagsList>
               {repo?.tags?.map((tag) => (
-                <RepositoryTag key={tag.id}>{tag.text}</RepositoryTag>
+                <RepositoryTag key={tag.id}>
+                  <span>{tag.text}</span>
+                  <button onClick={() => onDeleteTag(repo!.id, tag.text)}>
+                    <FaX />
+                  </button>
+                </RepositoryTag>
               ))}
             </TagsList>
 
@@ -52,6 +57,7 @@ export function Modal({ isOpen, onClose, repo, onAddTag }: ModalProps) {
               onSubmit={(e) => {
                 e.preventDefault();
                 onAddTag(repo!.id, tagText);
+                setTagText("");
               }}
             >
               <Input

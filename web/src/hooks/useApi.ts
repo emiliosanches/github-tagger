@@ -6,7 +6,7 @@ const instance = axios.create({
 });
 
 interface UseApiFetchOptions {
-  axiosOptions: Omit<AxiosRequestConfig, "baseURL">;
+  axiosOptions?: Omit<AxiosRequestConfig, "baseURL">;
   routeParams?: {
     [x: string]: string;
   };

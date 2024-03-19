@@ -62,6 +62,20 @@ export function RepositoriesList() {
     []
   );
 
+  const { dispatch: dispatchRemoveTag } = useApi(
+    {
+      axiosOptions: {
+        url: "/repositories/:id/tags/:tagText",
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+      manual: true,
+    },
+    []
+  );
+
   useEffect(() => {
     if (error) {
       alert("There was an error when trying to list your starred repos");
@@ -100,11 +114,21 @@ export function RepositoriesList() {
     }
   }
 
-  function handleDeleteTag(repositoryId: number, text: string) {
-    console.log({
-      repositoryId,
-      text,
-    });
+  async function handleDeleteTag(repositoryId: number, text: string) {
+    try {
+      await dispatchRemoveTag({
+        routeParams: {
+          id: String(repositoryId),
+          tagText: text,
+        },
+      });
+
+      await refreshRepos();
+    } catch (error) {
+      alert(
+        "There was an error when trying to remove this tag from the repository"
+      );
+    }
   }
 
   return (

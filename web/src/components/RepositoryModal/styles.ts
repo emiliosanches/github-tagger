@@ -78,11 +78,25 @@ export const TagsList = styled.div`
 `;
 
 export const RepositoryTag = styled.div`
+  display: flex;
+  align-items: center;
   background: #f14070;
   color: white;
   font-weight: bold;
   padding: 0.5rem 1rem;
   border-radius: 2rem;
+  gap: 0.5rem;
+
+  button {
+    border: none;
+    background: none;
+    outline: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
 `;
 
 export const AddTagForm = styled.form`
