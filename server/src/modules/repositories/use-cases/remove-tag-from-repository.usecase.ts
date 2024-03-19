@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
-import { ConflictError } from "../../../errors/ConflictError";
+import { NotFoundError } from "../../../errors/NotFoundError";
 
-export class AddTagToRepositoryUseCase {
+export class RemoveTagFromRepositoryUseCase {
   constructor(private readonly prisma: PrismaClient) {}
 
   async execute(userId: string, tagText: string, repositoryId: number) {
@@ -13,15 +13,15 @@ export class AddTagToRepositoryUseCase {
       },
     });
 
-    if (tag) {
-      throw new ConflictError("This tag is already added to the repository");
+    if (!tag) {
+      throw new NotFoundError(
+        "The specified tag does not exist in the repository"
+      );
     }
 
-    await this.prisma.repositoryTag.create({
-      data: {
-        repositoryId,
-        text: tagText,
-        userId,
+    await this.prisma.repositoryTag.delete({
+      where: {
+        id: tag.id,
       },
     });
   }

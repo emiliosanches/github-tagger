@@ -22,5 +22,8 @@ router.get("/repositories", protectedRoute, (req, res) =>
 router.post("/repositories/:repositoryId/tags", protectedRoute, (req, res) =>
   repositoriesController.addTagToRepository(req, res)
 );
+router.delete("/repositories/:repositoryId/tags/:tagText", protectedRoute, (req, res) =>
+  repositoriesController.removeTagFromRepository(req, res)
+);
 
 export { router };
