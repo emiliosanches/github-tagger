@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useApi } from "../../hooks/useApi";
 import { AuthResponse } from "./types";
 import { AuthContext } from "../../contexts/AuthContext";
+import { LoginCallbackContainer } from "./styles";
 
 export function LoginCallback() {
   const navigate = useNavigate();
@@ -38,5 +39,9 @@ export function LoginCallback() {
     });
   }, [navigate, code, setToken]);
 
-  return <div>{code && <h1>Wait, you are logging in...</h1>}</div>;
+  return (
+    <LoginCallbackContainer>
+      {code && <h1>Wait, we are loading your login information...</h1>}
+    </LoginCallbackContainer>
+  );
 }
