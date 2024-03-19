@@ -19,4 +19,8 @@ router.get("/repositories", protectedRoute, (req, res) =>
   repositoriesController.listFavoriteRepositories(req, res)
 );
 
+router.post("/repositories/:repositoryId/tags", protectedRoute, (req, res) =>
+  repositoriesController.addTagToRepository(req, res)
+);
+
 export { router };
